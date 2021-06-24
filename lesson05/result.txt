@@ -1,0 +1,119 @@
+<font color="blue">  1: </font>&lt;!DOCTYPE html&gt;
+<font color="blue">  2: </font>&lt;html lang=&quot;ja&quot;&gt;
+<font color="blue">  3: </font>&lt;head&gt;
+<font color="blue">  4: </font>&lt;meta charset=&quot;UTF-8&quot;&gt;
+<font color="blue">  5: </font>&lt;title&gt;ビームを発射する&lt;/title&gt;
+<font color="blue">  6: </font>&lt;/head&gt;
+<font color="blue">  7: </font>&lt;body&gt;
+<font color="blue">  8: </font>&lt;canvas id=&quot;canvas&quot; width=&quot;800px&quot; height=&quot;600px&quot; style=&quot;background-color:black;&quot;&gt;&lt;/canvas&gt;
+<font color="blue">  9: </font>&lt;script&gt;
+<font color="blue"> 10: </font>&quot;use strict&quot;;
+<font color="blue"> 11: </font>// UFOの画像読み込み
+<font color="blue"> 12: </font>const ufoImage = new Image();
+<font color="blue"> 13: </font>ufoImage.src = &quot;./ufo.png&quot;;
+<font color="blue"> 14: </font>// キャノン砲の画像読み込み
+<font color="blue"> 15: </font>const cannonImage = new Image();
+<font color="blue"> 16: </font>cannonImage.src = &quot;./cannon.png&quot;;
+<font color="blue"> 17: </font>
+<font color="blue"> 18: </font>const canvas = document.getElementById(&quot;canvas&quot;);
+<font color="blue"> 19: </font>const context = canvas.getContext(&quot;2d&quot;);
+<font color="blue"> 20: </font>
+<font color="blue"> 21: </font>// UFOの初期位置は、とりあえず左上とする
+<font color="blue"> 22: </font>let ufoX = 0;
+<font color="blue"> 23: </font>let ufoY = 0;
+<font color="blue"> 24: </font>// 「目標点」の初期位置も、左上とする
+<font color="blue"> 25: </font>let ufoTargetX = 0;
+<font color="blue"> 26: </font>let ufoTargetY = 0;
+<font color="blue"> 27: </font>
+<font color="blue"> 28: </font>// キャノン砲の初期位置は、真ん中あたりとする
+<font color="blue"> 29: </font>let cannonX = 375;
+<font color="blue"> 30: </font>
+<font color="blue"> 31: </font>// 左右のカーソルキーが押されているかどうかを保持するフラグ
+<font color="blue"> 32: </font>let leftKeyPressed = false;
+<font color="blue"> 33: </font>let rightKeyPressed = false;
+<font color="blue"> 34: </font>
+<font color="blue"> 35: </font>// ビームが現在発射中であることを示すフラグ
+<font color="blue"> 36: </font>let beamFlag = false;
+<font color="blue"> 37: </font>// ビームのX, Y座標
+<font color="blue"> 38: </font>let beamX;
+<font color="blue"> 39: </font>let beamY;
+<font color="blue"> 40: </font>
+<font color="blue"> 41: </font>document.onkeydown = keyDown;
+<font color="blue"> 42: </font>document.onkeyup = keyUp;
+<font color="blue"> 43: </font>
+<font color="blue"> 44: </font>mainLoop();
+<font color="blue"> 45: </font>
+<font color="blue"> 46: </font>function mainLoop() {
+<font color="blue"> 47: </font>  // 画面をクリアする
+<font color="blue"> 48: </font>  context.clearRect(0, 0, 800, 600);
+<font color="blue"> 49: </font>  // UFOを描く
+<font color="blue"> 50: </font>  context.drawImage(ufoImage, ufoX, ufoY);
+<font color="blue"> 51: </font>  // キャノン砲を描く
+<font color="blue"> 52: </font>  context.drawImage(cannonImage, cannonX, 570);
+<font color="blue"> 53: </font>  // (発射中なら)ビームを描く
+<font color="blue"> 54: </font>  if (beamFlag) {
+<font color="blue"> 55: </font>    context.strokeStyle = &quot;yellow&quot;;
+<font color="blue"> 56: </font>    context.beginPath();
+<font color="blue"> 57: </font>    context.moveTo(beamX, beamY);
+<font color="blue"> 58: </font>    context.lineTo(beamX, beamY + 20);
+<font color="blue"> 59: </font>    context.stroke();
+<font color="blue"> 60: </font>  }
+<font color="blue"> 61: </font>  
+<font color="blue"> 62: </font>  // UFOを動かす
+<font color="blue"> 63: </font>  if (ufoX === ufoTargetX &amp;&amp; ufoY === ufoTargetY) {
+<font color="blue"> 64: </font>    // UFOの位置と目標点が一致しているので、新たな目標点を設定
+<font color="blue"> 65: </font>    ufoTargetX = Math.floor(Math.random() * 73) * 10;
+<font color="blue"> 66: </font>    ufoTargetY = Math.floor(Math.random() * 51) * 10;
+<font color="blue"> 67: </font>  }
+<font color="blue"> 68: </font>  // UFOを目標点に近づける
+<font color="blue"> 69: </font>  if (ufoX &lt; ufoTargetX) {
+<font color="blue"> 70: </font>    ufoX += 10;
+<font color="blue"> 71: </font>  } else if (ufoX &gt; ufoTargetX) {
+<font color="blue"> 72: </font>    ufoX -= 10;
+<font color="blue"> 73: </font>  }
+<font color="blue"> 74: </font>  if (ufoY &lt; ufoTargetY) {
+<font color="blue"> 75: </font>    ufoY += 10;
+<font color="blue"> 76: </font>  } else if (ufoY &gt; ufoTargetY) {
+<font color="blue"> 77: </font>    ufoY -= 10;
+<font color="blue"> 78: </font>  }
+<font color="blue"> 79: </font>
+<font color="blue"> 80: </font>  // キャノン砲を動かす
+<font color="blue"> 81: </font>  if (leftKeyPressed &amp;&amp; cannonX &gt; 0) {
+<font color="blue"> 82: </font>    cannonX -= 10;
+<font color="blue"> 83: </font>  } else if (rightKeyPressed &amp;&amp; cannonX &lt; 750) {
+<font color="blue"> 84: </font>    cannonX += 10;
+<font color="blue"> 85: </font>  }
+<font color="blue"> 86: </font>  // (発射中なら)ビームを動かす
+<font color="blue"> 87: </font>  if (beamFlag) {
+<font color="blue"> 88: </font>    if (beamY &gt; 0) {
+<font color="blue"> 89: </font>      beamY -= 10;
+<font color="blue"> 90: </font>    } else {
+<font color="blue"> 91: </font>      beamFlag = false;
+<font color="blue"> 92: </font>    }
+<font color="blue"> 93: </font>  }
+<font color="blue"> 94: </font>
+<font color="blue"> 95: </font>  setTimeout(mainLoop, 20);
+<font color="blue"> 96: </font>}
+<font color="blue"> 97: </font>
+<font color="blue"> 98: </font>function keyDown(e) {
+<font color="blue"> 99: </font>  if (e.code === &quot;ArrowLeft&quot;) {
+<font color="blue">100: </font>    leftKeyPressed = true;
+<font color="blue">101: </font>  } else if (e.code === &quot;ArrowRight&quot;) {
+<font color="blue">102: </font>    rightKeyPressed = true;
+<font color="blue">103: </font>  } else if (e.code === &quot;Space&quot; &amp;&amp; !beamFlag) {
+<font color="blue">104: </font>    beamFlag = true;
+<font color="blue">105: </font>    beamX = cannonX + 25;
+<font color="blue">106: </font>    beamY = 550;
+<font color="blue">107: </font>  }
+<font color="blue">108: </font>}
+<font color="blue">109: </font>
+<font color="blue">110: </font>function keyUp(e) {
+<font color="blue">111: </font>  if (e.code === &quot;ArrowLeft&quot;) {
+<font color="blue">112: </font>    leftKeyPressed = false;
+<font color="blue">113: </font>  } else if (e.code === &quot;ArrowRight&quot;) {
+<font color="blue">114: </font>    rightKeyPressed = false;
+<font color="blue">115: </font>  }
+<font color="blue">116: </font>}
+<font color="blue">117: </font>&lt;/script&gt;
+<font color="blue">118: </font>&lt;/body&gt;
+<font color="blue">119: </font>&lt;/html&gt;

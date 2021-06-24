@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UFOを動かす(失敗版)</title>
+</head>
+<body>
+<canvas id="canvas" width="800px" height="100px" style="background-color:black;"></canvas>
+<script>
+// UFOの画像を読み込む
+const ufoImage = new Image();
+ufoImage.src = "./ufo.png";
+ufoImage.onload = drawUfo;
+
+function drawUfo() {
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+
+  for (let x = 0; x <= 720; x += 10) {
+    context.drawImage(ufoImage, x, 10);
+  }
+}
+</script>
+</body>
+</html>

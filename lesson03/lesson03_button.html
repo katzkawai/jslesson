@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ボタンを指す変数をコピーする</title>
+</head>
+<body>
+<p><button id="test_button">ボタンだよ!</button></p>
+<script>
+"use strict";
+const button1 = document.getElementById("test_button");
+const button2 = button1;
+button1.onclick = changeButton;
+
+function changeButton() {
+  button1.textContent = "変更したよ!"
+  console.log("button2.textContent.." + button2.textContent);
+}
+</script>
+</body>
+</html>

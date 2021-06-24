@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UFOを表示する(多分失敗)</title>
+</head>
+<body>
+<canvas id="canvas" width="200px" height="100px" style="background-color:black;"></canvas>
+<script>
+// UFOの画像を読み込む
+const ufoImage = new Image();
+ufoImage.src = "./ufo.png";
+
+// canvasに描画する
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+context.drawImage(ufoImage, 10, 10);
+</script>
+</body>
+</html>

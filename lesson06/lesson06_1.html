@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UFOゲーム</title>
+</head>
+<body>
+<canvas id="canvas" width="800px" height="600px" style="background-color:black;"></canvas>
+<script>
+"use strict";
+// UFOの画像読み込み
+const ufoImage = new Image();
+ufoImage.src = "./ufo.png";
+// UFOの画像読み込み(爆発2パターン)
+const ufoExplosionImage1 = new Image();
+ufoExplosionImage1.src = "./ufo_explosion1.png";
+const ufoExplosionImage2 = new Image();
+ufoExplosionImage2.src = "./ufo_explosion2.png";
+
+// キャノン砲の画像読み込み
+const cannonImage = new Image();
+cannonImage.src = "./cannon.png";
+
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+// UFOの初期位置は、とりあえず左上とする
+let ufoX = 0;
+let ufoY = 0;
+// 「目標点」の初期位置も、左上とする
+let ufoTargetX = 0;
+let ufoTargetY = 0;
+
+// キャノン砲の初期位置は、真ん中あたりとする
+let cannonX = 375;
+
+// 左右のカーソルキーが押されているかどうかを保持するフラグ
+let leftKeyPressed = false;
+let rightKeyPressed = false;
+
+// ビームが現在発射中であることを示すフラグ
+let beamFlag = false;
+// ビームのX, Y座標
+let beamX;
+let beamY;
+
+document.onkeydown = keyDown;
+document.onkeyup = keyUp;
+
+// UFOが爆発するアニメーションの繰り返し回数
+let ufoExplosionCounter;
+
+mainLoop();
+
+function mainLoop() {
+  // 画面をクリアする
+  context.clearRect(0, 0, 800, 600);
+  // UFOを描く
+  context.drawImage(ufoImage, ufoX, ufoY);
+  // キャノン砲を描く
+  context.drawImage(cannonImage, cannonX, 570);
+  // (発射中なら)ビームを描く
+  if (beamFlag) {
+    context.strokeStyle = "yellow";
+    context.beginPath();
+    context.moveTo(beamX, beamY);
+    context.lineTo(beamX, beamY + 20);
+    context.stroke();
+  }
+
+  // ビームが当たったかどうかを判定する
+  if (beamFlag) {
+    if (beamX > ufoX && beamX < ufoX + 79
+        && beamY > ufoY && beamY < ufoY + 31) {
+      ufoExplosionCounter = 0;
+      shootDown();
+      return;
+    }
+  }
+
+  // UFOを動かす
+  if (ufoX === ufoTargetX && ufoY === ufoTargetY) {
+    // UFOの位置と目標点が一致しているので、新たな目標点を設定
+    ufoTargetX = Math.floor(Math.random() * 73) * 10;
+    ufoTargetY = Math.floor(Math.random() * 51) * 10;
+  }
+  // UFOを目標点に近づける
+  if (ufoX < ufoTargetX) {
+    ufoX += 10;
+  } else if (ufoX > ufoTargetX) {
+    ufoX -= 10;
+  }
+  if (ufoY < ufoTargetY) {
+    ufoY += 10;
+  } else if (ufoY > ufoTargetY) {
+    ufoY -= 10;
+  }
+
+  // キャノン砲を動かす
+  if (leftKeyPressed && cannonX > 0) {
+    cannonX -= 10;
+  } else if (rightKeyPressed && cannonX < 750) {
+    cannonX += 10;
+  }
+  // (発射中なら)ビームを動かす
+  if (beamFlag) {
+    if (beamY > 0) {
+      beamY -= 10;
+    } else {
+      beamFlag = false;
+    }
+  }
+
+  setTimeout(mainLoop, 20);
+}
+
+function keyDown(e) {
+  if (e.code === "ArrowLeft") {
+    leftKeyPressed = true;
+  } else if (e.code === "ArrowRight") {
+    rightKeyPressed = true;
+  } else if (e.code === "Space" && !beamFlag) {
+    beamFlag = true;
+    beamX = cannonX + 25;
+    beamY = 550;
+  }
+}
+
+function keyUp(e) {
+  if (e.code === "ArrowLeft") {
+    leftKeyPressed = false;
+  } else if (e.code === "ArrowRight") {
+    rightKeyPressed = false;
+  }
+}
+
+// UFOを撃墜したときに呼び出される関数
+function shootDown() {
+  if (ufoExplosionCounter % 2 === 0) {
+    context.drawImage(ufoExplosionImage1, ufoX, ufoY);
+  } else {
+    context.drawImage(ufoExplosionImage2, ufoX, ufoY);
+  }
+  ufoExplosionCounter++;
+  if (ufoExplosionCounter <= 30) {
+    setTimeout(shootDown, 100);
+  } else {
+    ufoX = 0;
+    ufoY = 0;
+    ufoTargetX = 0;
+    ufoTargetY = 0;
+    beamFlag = false;
+    mainLoop();
+  }
+}
+</script>
+</body>
+</html>

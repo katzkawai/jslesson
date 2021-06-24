@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UFOをランダムに動かす(その2)</title>
+</head>
+<body>
+<canvas id="canvas" width="800px" height="600px" style="background-color:black;"></canvas>
+<script>
+"use strict";
+const ufoImage = new Image();
+ufoImage.src = "./ufo.png";
+
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+// UFOの初期位置は、とりあえず左上とする
+let ufoX = 0;
+let ufoY = 0;
+// 「目標点」の初期位置も、左上とする
+let ufoTargetX = 0;
+let ufoTargetY = 0;
+
+mainLoop();
+
+function mainLoop() {
+  context.clearRect(0, 0, 800, 600);
+  context.drawImage(ufoImage, ufoX, ufoY);
+
+  if (ufoX === ufoTargetX && ufoY === ufoTargetY) {
+    // UFOの位置と目標点が一致しているので、新たな目標点を設定
+    ufoTargetX = Math.floor(Math.random() * 73) * 10;
+    ufoTargetY = Math.floor(Math.random() * 51) * 10;
+  }
+  // UFOを目標点に近づける
+  if (ufoX < ufoTargetX) {
+    ufoX += 10;
+  } else if (ufoX > ufoTargetX) {
+    ufoX -= 10;
+  }
+  if (ufoY < ufoTargetY) {
+    ufoY += 10;
+  } else if (ufoY > ufoTargetY) {
+    ufoY -= 10;
+  }
+  setTimeout(mainLoop, 20);
+}
+</script>
+</body>
+</html>

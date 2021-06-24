@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UFOをランダムに動かす(その1)</title>
+</head>
+<body>
+<canvas id="canvas" width="800px" height="600px" style="background-color:black;"></canvas>
+<script>
+"use strict";
+const ufoImage = new Image();
+ufoImage.src = "./ufo.png";
+
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+// UFOの初期位置は、とりあえず左上とする
+let ufoX = 0;
+let ufoY = 0;
+
+mainLoop();
+
+function mainLoop() {
+  context.clearRect(0, 0, 800, 600);
+  context.drawImage(ufoImage, ufoX, ufoY);
+
+  if (Math.random() < 0.5) {
+    if (ufoX > 0) { // 画面をはみ出してしまわないためのチェック
+      ufoX -= 10;
+    }
+  } else {
+    if (ufoX < 720) {
+      ufoX += 10;
+    }
+  }
+  if (Math.random() < 0.5) {
+    if (ufoY > 0) {
+      ufoY -= 10;
+    }
+  } else {
+    if (ufoY < 500) { // 下端はキャノン砲の分、ちょっと空けておく
+      ufoY += 10;
+    }
+  }
+  setTimeout(mainLoop, 20);
+}
+</script>
+</body>
+</html>
